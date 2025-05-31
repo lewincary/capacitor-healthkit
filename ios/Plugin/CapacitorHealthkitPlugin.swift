@@ -802,30 +802,43 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
     
     // Helper method to get the appropriate unit for a quantity type
     private func getUnitForQuantityType(_ quantityType: HKQuantityType) -> HKUnit {
-        if quantityType.identifier == HKQuantityTypeIdentifier.stepCount {
+        switch quantityType.identifier.rawValue {
+        case HKQuantityTypeIdentifier.stepCount.rawValue:
             return HKUnit.count()
-        } else if quantityType.identifier == HKQuantityTypeIdentifier.distanceWalkingRunning {
+        case HKQuantityTypeIdentifier.distanceWalkingRunning.rawValue:
             return HKUnit.meter()
-        } else if quantityType.identifier == HKQuantityTypeIdentifier.activeEnergyBurned {
+        case HKQuantityTypeIdentifier.activeEnergyBurned.rawValue:
             return HKUnit.kilocalorie()
-        } else if quantityType.identifier == HKQuantityTypeIdentifier.appleExerciseTime {
+        case HKQuantityTypeIdentifier.appleExerciseTime.rawValue:
             return HKUnit.minute()
-        } else if quantityType.identifier == HKQuantityTypeIdentifier.appleStandTime {
+        case HKQuantityTypeIdentifier.appleStandTime.rawValue:
             return HKUnit.minute()
-        } else if quantityType.identifier == HKQuantityTypeIdentifier.heartRate {
+        case HKQuantityTypeIdentifier.heartRate.rawValue:
             return HKUnit(from: "count/min")
-        } else if quantityType.identifier == HKQuantityTypeIdentifier.restingHeartRate {
+        case HKQuantityTypeIdentifier.restingHeartRate.rawValue:
             return HKUnit(from: "count/min")
-        } else if quantityType.identifier == HKQuantityTypeIdentifier.bodyMass {
+        case HKQuantityTypeIdentifier.bodyMass.rawValue:
             return HKUnit.gramUnit(with: .kilo)
-        } else if quantityType.identifier == HKQuantityTypeIdentifier.respiratoryRate {
+        case HKQuantityTypeIdentifier.respiratoryRate.rawValue:
             return HKUnit(from: "count/min")
-        } else if quantityType.identifier == HKQuantityTypeIdentifier.bodyFatPercentage {
+        case HKQuantityTypeIdentifier.bodyFatPercentage.rawValue:
             return HKUnit.percent()
-        } else if quantityType.identifier == HKQuantityTypeIdentifier.oxygenSaturation {
+        case HKQuantityTypeIdentifier.oxygenSaturation.rawValue:
             return HKUnit.percent()
+        default:
+            // Default fallback based on the unit type
+            if quantityType.is(compatibleWith: HKUnit.meter()) {
+                return HKUnit.meter()
+            } else if quantityType.is(compatibleWith: HKUnit.count()) {
+                return HKUnit.count()
+            } else if quantityType.is(compatibleWith: HKUnit.minute()) {
+                return HKUnit.minute()
+            } else if quantityType.is(compatibleWith: HKUnit.kilocalorie()) {
+                return HKUnit.kilocalorie()
+            } else if quantityType.is(compatibleWith: HKUnit.percent()) {
+                return HKUnit.percent()
+            }
+            return HKUnit.count() // Final fallback
         }
-        // Add more cases as needed
-        return HKUnit.count() // Default fallback
     }
 }
