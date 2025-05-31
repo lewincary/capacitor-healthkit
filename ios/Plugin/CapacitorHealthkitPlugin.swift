@@ -320,7 +320,23 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                 let sleepED = sample.endDate as NSDate
                 let sleepInterval = sleepED.timeIntervalSince(sleepSD as Date)
                 let sleepHoursBetweenDates = sleepInterval / 3600
-                let sleepState = (sample.value == HKCategoryValueSleepAnalysis.inBed.rawValue) ? "InBed" : "Asleep"
+                let sleepState: String
+                switch sample.value {
+                case HKCategoryValueSleepAnalysis.inBed.rawValue:
+                    sleepState = "InBed"
+                case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
+                    sleepState = "AsleepUnspecified"
+                case HKCategoryValueSleepAnalysis.awake.rawValue:
+                    sleepState = "Awake"
+                case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
+                    sleepState = "AsleepCore"
+                case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
+                    sleepState = "AsleepDeep"
+                case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+                    sleepState = "AsleepREM"
+                default:
+                    sleepState = "Unknown"
+                }
                 let constructedSample: [String: Any] = [
                     "uuid": sample.uuid.uuidString,
                     "timeZone": getTimeZoneString(sample: sample) as String,

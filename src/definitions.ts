@@ -64,7 +64,7 @@ export interface BaseData {
  * These data points are specific for sleep data.
  */
 export interface SleepData extends BaseData  {
-  sleepState: string;
+  sleepState: 'InBed' | 'AsleepUnspecified' | 'Awake' | 'AsleepCore' | 'AsleepDeep' | 'AsleepREM' | 'Unknown';
   timeZone: string;
 }
 
