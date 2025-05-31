@@ -131,6 +131,30 @@
           "MultipleEditionQuery"
         ],
         "slug": "multipleiseditionauthorized"
+      },
+      {
+        "name": "queryHKitStatistics",
+        "signature": "(queryOptions: StatisticsQueryOptions) => Promise<StatisticsQueryOutput>",
+        "parameters": [
+          {
+            "name": "queryOptions",
+            "docs": "defines the type of data, time period, and aggregation options",
+            "type": "StatisticsQueryOptions"
+          }
+        ],
+        "returns": "Promise<StatisticsQueryOutput>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "queryOptions defines the type of data, time period, and aggregation options"
+          }
+        ],
+        "docs": "Query HealthKit for aggregated statistics over a time period.\nThis is more efficient than querying individual samples for aggregated data.",
+        "complexTypes": [
+          "StatisticsQueryOutput",
+          "StatisticsQueryOptions"
+        ],
+        "slug": "queryhkitstatistics"
       }
     ],
     "properties": []
@@ -254,9 +278,95 @@
           "type": "string[]"
         }
       ]
+    },
+    {
+      "name": "StatisticsQueryOutput",
+      "slug": "statisticsqueryoutput",
+      "docs": "Output format for statistics queries",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "statistics",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "{ startDate: string; endDate: string; sum: number; }[]"
+        }
+      ]
+    },
+    {
+      "name": "StatisticsQueryOptions",
+      "slug": "statisticsqueryoptions",
+      "docs": "Options for querying HealthKit statistics",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "sampleName",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "startDate",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "endDate",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "intervalComponents",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "{ day: number; }"
+        },
+        {
+          "name": "options",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "StatisticsOptions"
+          ],
+          "type": "StatisticsOptions"
+        }
+      ]
     }
   ],
   "enums": [],
-  "typeAliases": [],
+  "typeAliases": [
+    {
+      "name": "StatisticsOptions",
+      "slug": "statisticsoptions",
+      "docs": "Available statistics aggregation options",
+      "types": [
+        {
+          "text": "'cumulativeSum'",
+          "complexTypes": []
+        },
+        {
+          "text": "'discreteAverage'",
+          "complexTypes": []
+        },
+        {
+          "text": "'discreteMin'",
+          "complexTypes": []
+        },
+        {
+          "text": "'discreteMax'",
+          "complexTypes": []
+        }
+      ]
+    }
+  ],
   "pluginConfigs": []
 }

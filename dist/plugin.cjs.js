@@ -52,7 +52,10 @@ class CapacitorHealthkitWeb extends core.WebPlugin {
     async isEditionAuthorized(_queryOptions) {
         throw this.unimplemented('Not implemented on web.');
     }
-    async multipleIsEditionAuthorized() {
+    async multipleIsEditionAuthorized(_queryOptions) {
+        throw this.unimplemented('Not implemented on web.');
+    }
+    async queryHKitStatistics(_options) {
         throw this.unimplemented('Not implemented on web.');
     }
 }

@@ -29,6 +29,12 @@ export interface CapacitorHealthkitPlugin {
      * @param queryOptions defines the sampletypes for which you need to check for writing permission.
      */
     multipleIsEditionAuthorized(queryOptions: MultipleEditionQuery): Promise<void>;
+    /**
+     * Query HealthKit for aggregated statistics over a time period.
+     * This is more efficient than querying individual samples for aggregated data.
+     * @param queryOptions defines the type of data, time period, and aggregation options
+     */
+    queryHKitStatistics(queryOptions: StatisticsQueryOptions): Promise<StatisticsQueryOutput>;
 }
 /**
  * This interface is used for any results coming from HealthKit. It always has a count and the actual results.
@@ -145,4 +151,30 @@ export declare enum SampleNames {
     BODY_TEMPERATURE = "bodyTemperature",
     BLOOD_PRESSURE_SYSTOLIC = "bloodPressureSystolic",
     BLOOD_PRESSURE_DIASTOLIC = "bloodPressureDiastolic"
+}
+/**
+ * Options for querying HealthKit statistics
+ */
+export interface StatisticsQueryOptions {
+    sampleName: string;
+    startDate: string;
+    endDate: string;
+    intervalComponents: {
+        day: number;
+    };
+    options: StatisticsOptions;
+}
+/**
+ * Available statistics aggregation options
+ */
+export declare type StatisticsOptions = 'cumulativeSum' | 'discreteAverage' | 'discreteMin' | 'discreteMax';
+/**
+ * Output format for statistics queries
+ */
+export interface StatisticsQueryOutput {
+    statistics: {
+        startDate: string;
+        endDate: string;
+        sum: number;
+    }[];
 }

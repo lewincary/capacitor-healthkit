@@ -2,11 +2,14 @@
 import { WebPlugin } from '@capacitor/core';
 
 import type {
-  EditionQuery,
-  AuthorizationQueryOptions,
   CapacitorHealthkitPlugin,
-  MultipleQueryOptions,
+  AuthorizationQueryOptions,
   SingleQueryOptions,
+  MultipleQueryOptions,
+  EditionQuery,
+  MultipleEditionQuery,
+  StatisticsQueryOptions,
+  StatisticsQueryOutput,
 } from './definitions';
 
 export class CapacitorHealthkitWeb
@@ -36,7 +39,15 @@ export class CapacitorHealthkitWeb
     throw this.unimplemented('Not implemented on web.');
   }
 
-  async multipleIsEditionAuthorized(): Promise<void> {
+  async multipleIsEditionAuthorized(
+    _queryOptions: MultipleEditionQuery,
+  ): Promise<void> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  async queryHKitStatistics(
+    _options: StatisticsQueryOptions,
+  ): Promise<StatisticsQueryOutput> {
     throw this.unimplemented('Not implemented on web.');
   }
 }

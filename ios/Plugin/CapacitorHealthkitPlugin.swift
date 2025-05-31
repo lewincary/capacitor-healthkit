@@ -707,4 +707,125 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
         }
         healthStore.execute(query)
     }
+
+    @objc func queryHKitStatistics(_ call: CAPPluginCall) {
+        guard let sampleName = call.options["sampleName"] as? String else {
+            return call.reject("Must provide sampleName")
+        }
+        guard let startDateString = call.options["startDate"] as? String else {
+            return call.reject("Must provide startDate")
+        }
+        guard let endDateString = call.options["endDate"] as? String else {
+            return call.reject("Must provide endDate")
+        }
+        guard let intervalComponents = call.options["intervalComponents"] as? [String: Int],
+              let dayInterval = intervalComponents["day"] else {
+            return call.reject("Must provide intervalComponents with day value")
+        }
+        guard let options = call.options["options"] as? String else {
+            return call.reject("Must provide options")
+        }
+
+        let startDate = getDateFromString(inputDate: startDateString)
+        let endDate = getDateFromString(inputDate: endDateString)
+        
+        // Get the quantity type
+        guard let quantityType = getSampleType(sampleName: sampleName) as? HKQuantityType else {
+            return call.reject("Sample type must be a quantity type")
+        }
+        
+        // Create the components for the interval
+        let interval = DateComponents(day: dayInterval)
+        
+        // Determine the statistics options
+        let statisticsOptions: HKStatisticsOptions
+        switch options {
+        case "cumulativeSum":
+            statisticsOptions = .cumulativeSum
+        case "discreteAverage":
+            statisticsOptions = .discreteAverage
+        case "discreteMin":
+            statisticsOptions = .discreteMin
+        case "discreteMax":
+            statisticsOptions = .discreteMax
+        default:
+            return call.reject("Invalid statistics options")
+        }
+        
+        // Create anchor date at start of day in user's timezone
+        let calendar = Calendar.current
+        let anchorDate = calendar.startOfDay(for: Date())
+        
+        // Create the query
+        let query = HKStatisticsCollectionQuery(
+            quantityType: quantityType,
+            quantitySamplePredicate: nil,
+            options: statisticsOptions,
+            anchorDate: anchorDate,
+            intervalComponents: interval
+        )
+        
+        // Set the results handler
+        query.initialResultsHandler = { query, results, error in
+            if let error = error {
+                return call.reject("Error fetching statistics: \(error.localizedDescription)")
+            }
+            
+            guard let results = results else {
+                return call.reject("No results returned")
+            }
+            
+            var statisticsArray: [[String: Any]] = []
+            
+            // Get the appropriate unit for this quantity type
+            let unit = self.getUnitForQuantityType(quantityType)
+            
+            results.enumerateStatistics(from: startDate, to: endDate) { statistic, stop in
+                if let quantity = statistic.sumQuantity() {
+                    let stat: [String: Any] = [
+                        "startDate": ISO8601DateFormatter().string(from: statistic.startDate),
+                        "endDate": ISO8601DateFormatter().string(from: statistic.endDate),
+                        "sum": quantity.doubleValue(for: unit)
+                    ]
+                    statisticsArray.append(stat)
+                }
+            }
+            
+            call.resolve([
+                "statistics": statisticsArray
+            ])
+        }
+        
+        // Execute the query
+        healthStore.execute(query)
+    }
+    
+    // Helper method to get the appropriate unit for a quantity type
+    private func getUnitForQuantityType(_ quantityType: HKQuantityType) -> HKUnit {
+        if quantityType.identifier == HKQuantityTypeIdentifier.stepCount {
+            return HKUnit.count()
+        } else if quantityType.identifier == HKQuantityTypeIdentifier.distanceWalkingRunning {
+            return HKUnit.meter()
+        } else if quantityType.identifier == HKQuantityTypeIdentifier.activeEnergyBurned {
+            return HKUnit.kilocalorie()
+        } else if quantityType.identifier == HKQuantityTypeIdentifier.appleExerciseTime {
+            return HKUnit.minute()
+        } else if quantityType.identifier == HKQuantityTypeIdentifier.appleStandTime {
+            return HKUnit.minute()
+        } else if quantityType.identifier == HKQuantityTypeIdentifier.heartRate {
+            return HKUnit(from: "count/min")
+        } else if quantityType.identifier == HKQuantityTypeIdentifier.restingHeartRate {
+            return HKUnit(from: "count/min")
+        } else if quantityType.identifier == HKQuantityTypeIdentifier.bodyMass {
+            return HKUnit.gramUnit(with: .kilo)
+        } else if quantityType.identifier == HKQuantityTypeIdentifier.respiratoryRate {
+            return HKUnit(from: "count/min")
+        } else if quantityType.identifier == HKQuantityTypeIdentifier.bodyFatPercentage {
+            return HKUnit.percent()
+        } else if quantityType.identifier == HKQuantityTypeIdentifier.oxygenSaturation {
+            return HKUnit.percent()
+        }
+        // Add more cases as needed
+        return HKUnit.count() // Default fallback
+    }
 }

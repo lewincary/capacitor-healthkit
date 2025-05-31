@@ -109,7 +109,9 @@ And you're all set ! :+1:
 * [`multipleQueryHKitSampleType(...)`](#multiplequeryhkitsampletype)
 * [`isEditionAuthorized(...)`](#iseditionauthorized)
 * [`multipleIsEditionAuthorized(...)`](#multipleiseditionauthorized)
+* [`queryHKitStatistics(...)`](#queryhkitstatistics)
 * [Interfaces](#interfaces)
+* [Type Aliases](#type-aliases)
 
 </docgen-index>
 
@@ -206,6 +208,24 @@ Checks if there is writing permission for multiple sample types. This function h
 --------------------
 
 
+### queryHKitStatistics(...)
+
+```typescript
+queryHKitStatistics(queryOptions: StatisticsQueryOptions) => Promise<StatisticsQueryOutput>
+```
+
+Query HealthKit for aggregated statistics over a time period.
+This is more efficient than querying individual samples for aggregated data.
+
+| Param              | Type                                                                      | Description                                                    |
+| ------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| **`queryOptions`** | <code><a href="#statisticsqueryoptions">StatisticsQueryOptions</a></code> | defines the type of data, time period, and aggregation options |
+
+**Returns:** <code>Promise&lt;<a href="#statisticsqueryoutput">StatisticsQueryOutput</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -264,6 +284,38 @@ This is used for checking writing permissions.
 | Prop              | Type                  |
 | ----------------- | --------------------- |
 | **`sampleNames`** | <code>string[]</code> |
+
+
+#### StatisticsQueryOutput
+
+Output format for statistics queries
+
+| Prop             | Type                                                                |
+| ---------------- | ------------------------------------------------------------------- |
+| **`statistics`** | <code>{ startDate: string; endDate: string; sum: number; }[]</code> |
+
+
+#### StatisticsQueryOptions
+
+Options for querying HealthKit statistics
+
+| Prop                     | Type                                                            |
+| ------------------------ | --------------------------------------------------------------- |
+| **`sampleName`**         | <code>string</code>                                             |
+| **`startDate`**          | <code>string</code>                                             |
+| **`endDate`**            | <code>string</code>                                             |
+| **`intervalComponents`** | <code>{ day: number; }</code>                                   |
+| **`options`**            | <code><a href="#statisticsoptions">StatisticsOptions</a></code> |
+
+
+### Type Aliases
+
+
+#### StatisticsOptions
+
+Available statistics aggregation options
+
+<code>'cumulativeSum' | 'discreteAverage' | 'discreteMin' | 'discreteMax'</code>
 
 </docgen-api>
 
