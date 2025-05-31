@@ -9,7 +9,7 @@
   "files": [
     "dist/",
     "ios/Plugin/",
-    "PerfoodCapacitorHealthkit.podspec"
+    "LewincaryCapacitorHealthkit.podspec"
   ],
   "author": "Perfood GmbH",
   "license": "MIT",
