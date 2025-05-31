@@ -321,21 +321,35 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                 let sleepInterval = sleepED.timeIntervalSince(sleepSD as Date)
                 let sleepHoursBetweenDates = sleepInterval / 3600
                 let sleepState: String
-                switch sample.value {
-                case HKCategoryValueSleepAnalysis.inBed.rawValue:
-                    sleepState = "InBed"
-                case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
-                    sleepState = "AsleepUnspecified"
-                case HKCategoryValueSleepAnalysis.awake.rawValue:
-                    sleepState = "Awake"
-                case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
-                    sleepState = "AsleepCore"
-                case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
-                    sleepState = "AsleepDeep"
-                case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
-                    sleepState = "AsleepREM"
-                default:
-                    sleepState = "Unknown"
+                if #available(iOS 16.0, *) {
+                    // iOS 16.0+ with detailed sleep stages
+                    switch sample.value {
+                    case HKCategoryValueSleepAnalysis.inBed.rawValue:
+                        sleepState = "InBed"
+                    case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
+                        sleepState = "AsleepUnspecified"
+                    case HKCategoryValueSleepAnalysis.awake.rawValue:
+                        sleepState = "Awake"
+                    case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
+                        sleepState = "AsleepCore"
+                    case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
+                        sleepState = "AsleepDeep"
+                    case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+                        sleepState = "AsleepREM"
+                    default:
+                        sleepState = "Unknown"
+                    }
+                } else {
+                    // iOS 12.0-15.x fallback with basic sleep states
+                    switch sample.value {
+                    case HKCategoryValueSleepAnalysis.inBed.rawValue:
+                        sleepState = "InBed"
+                    case HKCategoryValueSleepAnalysis.awake.rawValue:
+                        sleepState = "Awake"
+                    default:
+                        // For older iOS versions, any other value is treated as "Asleep"
+                        sleepState = "Asleep"
+                    }
                 }
                 let constructedSample: [String: Any] = [
                     "uuid": sample.uuid.uuidString,
