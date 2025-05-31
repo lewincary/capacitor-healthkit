@@ -802,28 +802,28 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
     
     // Helper method to get the appropriate unit for a quantity type
     private func getUnitForQuantityType(_ quantityType: HKQuantityType) -> HKUnit {
-        switch quantityType.identifier.rawValue {
-        case HKQuantityTypeIdentifier.stepCount.rawValue:
+        switch quantityType.identifier {
+        case "HKQuantityTypeIdentifierStepCount":
             return HKUnit.count()
-        case HKQuantityTypeIdentifier.distanceWalkingRunning.rawValue:
+        case "HKQuantityTypeIdentifierDistanceWalkingRunning":
             return HKUnit.meter()
-        case HKQuantityTypeIdentifier.activeEnergyBurned.rawValue:
+        case "HKQuantityTypeIdentifierActiveEnergyBurned":
             return HKUnit.kilocalorie()
-        case HKQuantityTypeIdentifier.appleExerciseTime.rawValue:
+        case "HKQuantityTypeIdentifierAppleExerciseTime":
             return HKUnit.minute()
-        case HKQuantityTypeIdentifier.appleStandTime.rawValue:
+        case "HKQuantityTypeIdentifierAppleStandTime":
             return HKUnit.minute()
-        case HKQuantityTypeIdentifier.heartRate.rawValue:
+        case "HKQuantityTypeIdentifierHeartRate":
             return HKUnit(from: "count/min")
-        case HKQuantityTypeIdentifier.restingHeartRate.rawValue:
+        case "HKQuantityTypeIdentifierRestingHeartRate":
             return HKUnit(from: "count/min")
-        case HKQuantityTypeIdentifier.bodyMass.rawValue:
+        case "HKQuantityTypeIdentifierBodyMass":
             return HKUnit.gramUnit(with: .kilo)
-        case HKQuantityTypeIdentifier.respiratoryRate.rawValue:
+        case "HKQuantityTypeIdentifierRespiratoryRate":
             return HKUnit(from: "count/min")
-        case HKQuantityTypeIdentifier.bodyFatPercentage.rawValue:
+        case "HKQuantityTypeIdentifierBodyFatPercentage":
             return HKUnit.percent()
-        case HKQuantityTypeIdentifier.oxygenSaturation.rawValue:
+        case "HKQuantityTypeIdentifierOxygenSaturation":
             return HKUnit.percent()
         default:
             // Default fallback based on the unit type
