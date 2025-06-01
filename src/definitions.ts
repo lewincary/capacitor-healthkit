@@ -46,7 +46,9 @@ export interface CapacitorHealthkitPlugin {
 /**
  * This interface is used for any results coming from HealthKit. It always has a count and the actual results.
  */
-export interface QueryOutput<T = SleepData | ActivityData | OtherData> {
+export interface QueryOutput<
+  T = SleepData | ActivityData | OtherData | StandHourData
+> {
   countReturn: number;
   resultData: T[];
 }
@@ -105,6 +107,14 @@ export interface ActivityData extends BaseData {
 export interface OtherData extends BaseData {
   unitName: string;
   value: number;
+}
+
+/**
+ * These data points are specific for Apple Stand Hour data.
+ */
+export interface StandHourData extends BaseData {
+  standState: 'Stood' | 'Idle' | 'Unknown';
+  timeZone: string;
 }
 
 /**
@@ -177,6 +187,7 @@ export enum SampleNames {
   BODY_TEMPERATURE = 'bodyTemperature',
   BLOOD_PRESSURE_SYSTOLIC = 'bloodPressureSystolic',
   BLOOD_PRESSURE_DIASTOLIC = 'bloodPressureDiastolic',
+  APPLE_STAND_HOUR = 'appleStandHour',
 }
 
 /**

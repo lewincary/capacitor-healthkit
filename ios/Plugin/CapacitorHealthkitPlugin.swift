@@ -76,6 +76,8 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
             return HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bloodPressureSystolic)!
         case "bloodPressureDiastolic":
             return HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bloodPressureDiastolic)!
+        case "appleStandHour":
+            return HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.appleStandHour)!
         default:
             return nil
         }
@@ -122,6 +124,8 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                 types.insert(HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bloodPressureSystolic)!)
             case "bloodPressureDiastolic":
                 types.insert(HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bloodPressureDiastolic)!)
+            case "standHour":
+                types.insert(HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.appleStandHour)!)
             default:
                 print("no match in case: " + item)
             }
@@ -358,6 +362,32 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                     "endDate": ISO8601DateFormatter().string(from: sample.endDate),
                     "duration": sleepHoursBetweenDates,
                     "sleepState": sleepState,
+                    "source": sample.sourceRevision.source.name,
+                    "sourceBundleId": sample.sourceRevision.source.bundleIdentifier,
+                    "device": getDeviceInformation(device: sample.device),
+                ]
+                output.append(constructedSample)
+            } else if sampleName == "appleStandHour" {
+                guard let sample = result as? HKCategorySample else {
+                    return nil
+                }
+                let standState: String
+                switch sample.value {
+                case HKCategoryValueAppleStandHour.stood.rawValue:
+                    standState = "Stood"
+                case HKCategoryValueAppleStandHour.idle.rawValue:
+                    standState = "Idle"
+                default:
+                    standState = "Unknown"
+                }
+                
+                let constructedSample: [String: Any] = [
+                    "uuid": sample.uuid.uuidString,
+                    "timeZone": getTimeZoneString(sample: sample) as String,
+                    "startDate": ISO8601DateFormatter().string(from: sample.startDate),
+                    "endDate": ISO8601DateFormatter().string(from: sample.endDate),
+                    "duration": sample.endDate.timeIntervalSince(sample.startDate) / 3600,
+                    "standState": standState,
                     "source": sample.sourceRevision.source.name,
                     "sourceBundleId": sample.sourceRevision.source.bundleIdentifier,
                     "device": getDeviceInformation(device: sample.device),

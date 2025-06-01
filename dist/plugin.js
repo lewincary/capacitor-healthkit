@@ -26,6 +26,7 @@ var capacitorCapacitorHealthkit = (function (exports, core) {
         SampleNames["BODY_TEMPERATURE"] = "bodyTemperature";
         SampleNames["BLOOD_PRESSURE_SYSTOLIC"] = "bloodPressureSystolic";
         SampleNames["BLOOD_PRESSURE_DIASTOLIC"] = "bloodPressureDiastolic";
+        SampleNames["APPLE_STAND_HOUR"] = "appleStandHour";
     })(exports.SampleNames || (exports.SampleNames = {}));
 
     const CapacitorHealthkit = core.registerPlugin('CapacitorHealthkit', {

@@ -23,5 +23,6 @@ export var SampleNames;
     SampleNames["BODY_TEMPERATURE"] = "bodyTemperature";
     SampleNames["BLOOD_PRESSURE_SYSTOLIC"] = "bloodPressureSystolic";
     SampleNames["BLOOD_PRESSURE_DIASTOLIC"] = "bloodPressureDiastolic";
+    SampleNames["APPLE_STAND_HOUR"] = "appleStandHour";
 })(SampleNames || (SampleNames = {}));
 //# sourceMappingURL=definitions.js.map
