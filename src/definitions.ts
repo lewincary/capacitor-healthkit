@@ -188,6 +188,7 @@ export enum SampleNames {
   BLOOD_PRESSURE_SYSTOLIC = 'bloodPressureSystolic',
   BLOOD_PRESSURE_DIASTOLIC = 'bloodPressureDiastolic',
   APPLE_STAND_HOUR = 'appleStandHour',
+  VO2_MAX = 'vo2Max',
 }
 
 /**

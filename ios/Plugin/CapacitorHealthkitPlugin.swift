@@ -78,6 +78,11 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
             return HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bloodPressureDiastolic)!
         case "appleStandHour":
             return HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.appleStandHour)!
+        case "vo2Max":
+            if #available(iOS 11.0, *) {
+                return HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.vo2Max)!
+            }
+            return nil
         default:
             return nil
         }
@@ -126,6 +131,10 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                 types.insert(HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bloodPressureDiastolic)!)
             case "standHour":
                 types.insert(HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.appleStandHour)!)
+            case "vo2Max":
+                if #available(iOS 11.0, *) {
+                    types.insert(HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.vo2Max)!)
+                }
             default:
                 print("no match in case: " + item)
             }
@@ -466,7 +475,10 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                 var unit: HKUnit?
                 var unitName: String?
 
-                if sampleName == "heartRate" {
+                if sampleName == "vo2Max" {
+                    unit = HKUnit(from: "ml/kg*min")
+                    unitName = "ml/kg/min"
+                } else if sampleName == "heartRate" {
                     unit = HKUnit(from: "count/min")
                     unitName = "BPM"
                 } else if sampleName == "restingHeartRate" {
@@ -855,6 +867,8 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
             return HKUnit.percent()
         case "HKQuantityTypeIdentifierOxygenSaturation":
             return HKUnit.percent()
+        case "HKQuantityTypeIdentifierVO2Max":
+            return HKUnit(from: "ml/kg*min")
         default:
             // Default fallback based on the unit type
             if quantityType.is(compatibleWith: HKUnit.meter()) {
