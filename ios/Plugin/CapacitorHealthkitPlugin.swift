@@ -135,6 +135,8 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                 if #available(iOS 11.0, *) {
                     types.insert(HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.vo2Max)!)
                 }
+            case "activitySummary":
+                types.insert(HKObjectType.activitySummaryType())
             default:
                 print("no match in case: " + item)
             }
@@ -879,6 +881,59 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
         healthStore.execute(query)
     }
     
+    @objc func queryActivitySummary(_ call: CAPPluginCall) {
+        guard let startDateString = call.options["startDate"] as? String else {
+            return call.reject("Must provide startDate")
+        }
+        guard let endDateString = call.options["endDate"] as? String else {
+            return call.reject("Must provide endDate")
+        }
+
+        let startDate = getDateFromString(inputDate: startDateString)
+        let endDate = getDateFromString(inputDate: endDateString)
+
+        let calendar = Calendar.current
+        let startComponents = calendar.dateComponents([.year, .month, .day], from: startDate)
+        let endComponents = calendar.dateComponents([.year, .month, .day], from: endDate)
+
+        let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: startComponents, end: endComponents)
+
+        let query = HKActivitySummaryQuery(predicate: predicate) { _, summaries, error in
+            if let error = error {
+                return call.reject("Error fetching activity summaries: \(error.localizedDescription)")
+            }
+
+            guard let summaries = summaries else {
+                return call.resolve(["summaries": []])
+            }
+
+            let energyUnit = HKUnit.kilocalorie()
+            let minuteUnit = HKUnit.minute()
+            let countUnit = HKUnit.count()
+
+            var output: [[String: Any]] = []
+            for summary in summaries {
+                let dc = summary.dateComponents(for: calendar)
+                guard let year = dc.year, let month = dc.month, let day = dc.day else { continue }
+                let dateString = String(format: "%04d-%02d-%02d", year, month, day)
+
+                output.append([
+                    "date": dateString,
+                    "activeEnergyBurned": summary.activeEnergyBurned.doubleValue(for: energyUnit),
+                    "activeEnergyBurnedGoal": summary.activeEnergyBurnedGoal.doubleValue(for: energyUnit),
+                    "appleExerciseTime": summary.appleExerciseTime.doubleValue(for: minuteUnit),
+                    "appleExerciseTimeGoal": summary.appleExerciseTimeGoal.doubleValue(for: minuteUnit),
+                    "appleStandHours": summary.appleStandHours.doubleValue(for: countUnit),
+                    "appleStandHoursGoal": summary.appleStandHoursGoal.doubleValue(for: countUnit),
+                ])
+            }
+
+            call.resolve(["summaries": output])
+        }
+
+        healthStore.execute(query)
+    }
+
     // Helper method to get the appropriate unit for a quantity type
     private func getUnitForQuantityType(_ quantityType: HKQuantityType) -> HKUnit {
         switch quantityType.identifier {

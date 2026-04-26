@@ -35,6 +35,11 @@ export interface CapacitorHealthkitPlugin {
      * @param queryOptions defines the type of data, time period, and aggregation options
      */
     queryHKitStatistics(queryOptions: StatisticsQueryOptions): Promise<StatisticsQueryOutput>;
+    /**
+     * Query HealthKit activity summaries (move/exercise/stand rings) for a date range.
+     * Returns one summary per day — exactly the data shown in the Health app rings.
+     */
+    queryActivitySummary(queryOptions: ActivitySummaryQueryOptions): Promise<ActivitySummaryQueryOutput>;
 }
 /**
  * This interface is used for any results coming from HealthKit. It always has a count and the actual results.
@@ -186,4 +191,20 @@ export interface StatisticsQueryOutput {
         endDate: string;
         sum: number;
     }[];
+}
+export interface ActivitySummaryQueryOptions {
+    startDate: string;
+    endDate: string;
+}
+export interface ActivitySummaryData {
+    date: string;
+    activeEnergyBurned: number;
+    activeEnergyBurnedGoal: number;
+    appleExerciseTime: number;
+    appleExerciseTimeGoal: number;
+    appleStandHours: number;
+    appleStandHoursGoal: number;
+}
+export interface ActivitySummaryQueryOutput {
+    summaries: ActivitySummaryData[];
 }

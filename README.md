@@ -110,6 +110,7 @@ And you're all set ! :+1:
 * [`isEditionAuthorized(...)`](#iseditionauthorized)
 * [`multipleIsEditionAuthorized(...)`](#multipleiseditionauthorized)
 * [`queryHKitStatistics(...)`](#queryhkitstatistics)
+* [`queryActivitySummary(...)`](#queryactivitysummary)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -226,6 +227,24 @@ This is more efficient than querying individual samples for aggregated data.
 --------------------
 
 
+### queryActivitySummary(...)
+
+```typescript
+queryActivitySummary(queryOptions: ActivitySummaryQueryOptions) => Promise<ActivitySummaryQueryOutput>
+```
+
+Query HealthKit activity summaries (move/exercise/stand rings) for a date range.
+Returns one summary per day — exactly the data shown in the Health app rings.
+
+| Param              | Type                                                                                |
+| ------------------ | ----------------------------------------------------------------------------------- |
+| **`queryOptions`** | <code><a href="#activitysummaryqueryoptions">ActivitySummaryQueryOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#activitysummaryqueryoutput">ActivitySummaryQueryOutput</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -306,6 +325,34 @@ Options for querying HealthKit statistics
 | **`endDate`**            | <code>string</code>                                             |
 | **`intervalComponents`** | <code>{ day: number; }</code>                                   |
 | **`options`**            | <code><a href="#statisticsoptions">StatisticsOptions</a></code> |
+
+
+#### ActivitySummaryQueryOutput
+
+| Prop            | Type                               |
+| --------------- | ---------------------------------- |
+| **`summaries`** | <code>ActivitySummaryData[]</code> |
+
+
+#### ActivitySummaryData
+
+| Prop                         | Type                |
+| ---------------------------- | ------------------- |
+| **`date`**                   | <code>string</code> |
+| **`activeEnergyBurned`**     | <code>number</code> |
+| **`activeEnergyBurnedGoal`** | <code>number</code> |
+| **`appleExerciseTime`**      | <code>number</code> |
+| **`appleExerciseTimeGoal`**  | <code>number</code> |
+| **`appleStandHours`**        | <code>number</code> |
+| **`appleStandHoursGoal`**    | <code>number</code> |
+
+
+#### ActivitySummaryQueryOptions
+
+| Prop            | Type                |
+| --------------- | ------------------- |
+| **`startDate`** | <code>string</code> |
+| **`endDate`**   | <code>string</code> |
 
 
 ### Type Aliases

@@ -155,6 +155,25 @@
           "StatisticsQueryOptions"
         ],
         "slug": "queryhkitstatistics"
+      },
+      {
+        "name": "queryActivitySummary",
+        "signature": "(queryOptions: ActivitySummaryQueryOptions) => Promise<ActivitySummaryQueryOutput>",
+        "parameters": [
+          {
+            "name": "queryOptions",
+            "docs": "",
+            "type": "ActivitySummaryQueryOptions"
+          }
+        ],
+        "returns": "Promise<ActivitySummaryQueryOutput>",
+        "tags": [],
+        "docs": "Query HealthKit activity summaries (move/exercise/stand rings) for a date range.\nReturns one summary per day — exactly the data shown in the Health app rings.",
+        "complexTypes": [
+          "ActivitySummaryQueryOutput",
+          "ActivitySummaryQueryOptions"
+        ],
+        "slug": "queryactivitysummary"
       }
     ],
     "properties": []
@@ -338,6 +357,105 @@
             "StatisticsOptions"
           ],
           "type": "StatisticsOptions"
+        }
+      ]
+    },
+    {
+      "name": "ActivitySummaryQueryOutput",
+      "slug": "activitysummaryqueryoutput",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "summaries",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "ActivitySummaryData"
+          ],
+          "type": "ActivitySummaryData[]"
+        }
+      ]
+    },
+    {
+      "name": "ActivitySummaryData",
+      "slug": "activitysummarydata",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "date",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "activeEnergyBurned",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "activeEnergyBurnedGoal",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "appleExerciseTime",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "appleExerciseTimeGoal",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "appleStandHours",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "appleStandHoursGoal",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "ActivitySummaryQueryOptions",
+      "slug": "activitysummaryqueryoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "startDate",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "endDate",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
         }
       ]
     }
