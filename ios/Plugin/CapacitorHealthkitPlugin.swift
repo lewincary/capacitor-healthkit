@@ -83,6 +83,13 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                 return HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.vo2Max)!
             }
             return nil
+        case "heartRateVariabilitySDNN":
+            return HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRateVariabilitySDNN)!
+        case "appleTimeInDaylight":
+            if #available(iOS 17.0, *) {
+                return HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.timeInDaylight)!
+            }
+            return nil
         default:
             return nil
         }
@@ -134,6 +141,12 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
             case "vo2Max":
                 if #available(iOS 11.0, *) {
                     types.insert(HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.vo2Max)!)
+                }
+            case "heartRateVariabilitySDNN":
+                types.insert(HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRateVariabilitySDNN)!)
+            case "appleTimeInDaylight":
+                if #available(iOS 17.0, *) {
+                    types.insert(HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.timeInDaylight)!)
                 }
             default:
                 print("no match in case: " + item)
@@ -500,6 +513,12 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                 if sampleName == "vo2Max" {
                     unit = HKUnit(from: "ml/kg*min")
                     unitName = "ml/kg/min"
+                } else if sampleName == "heartRateVariabilitySDNN" {
+                    unit = HKUnit.secondUnit(with: .milli)
+                    unitName = "ms"
+                } else if sampleName == "appleTimeInDaylight" {
+                    unit = HKUnit.second()
+                    unitName = "s"
                 } else if sampleName == "heartRate" {
                     unit = HKUnit(from: "count/min")
                     unitName = "BPM"
@@ -1148,6 +1167,10 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
             return HKUnit.percent()
         case "HKQuantityTypeIdentifierVO2Max":
             return HKUnit(from: "ml/kg*min")
+        case "HKQuantityTypeIdentifierHeartRateVariabilitySDNN":
+            return HKUnit.secondUnit(with: .milli)
+        case "HKQuantityTypeIdentifierTimeInDaylight":
+            return HKUnit.second()
         default:
             // Default fallback based on the unit type
             if quantityType.is(compatibleWith: HKUnit.meter()) {

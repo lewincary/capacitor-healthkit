@@ -25,5 +25,7 @@ export var SampleNames;
     SampleNames["BLOOD_PRESSURE_DIASTOLIC"] = "bloodPressureDiastolic";
     SampleNames["APPLE_STAND_HOUR"] = "appleStandHour";
     SampleNames["VO2_MAX"] = "vo2Max";
+    SampleNames["HEART_RATE_VARIABILITY_SDNN"] = "heartRateVariabilitySDNN";
+    SampleNames["APPLE_TIME_IN_DAYLIGHT"] = "appleTimeInDaylight";
 })(SampleNames || (SampleNames = {}));
 //# sourceMappingURL=definitions.js.map
