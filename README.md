@@ -111,6 +111,7 @@ And you're all set ! :+1:
 * [`multipleIsEditionAuthorized(...)`](#multipleiseditionauthorized)
 * [`queryHKitStatistics(...)`](#queryhkitstatistics)
 * [`queryActivitySummary(...)`](#queryactivitysummary)
+* [`querySleepAggregatedByNight(...)`](#querysleepaggregatedbynight)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -245,6 +246,26 @@ Returns one summary per day — exactly the data shown in the Health app rings.
 --------------------
 
 
+### querySleepAggregatedByNight(...)
+
+```typescript
+querySleepAggregatedByNight(queryOptions: SleepAggregationQueryOptions) => Promise<SleepAggregationQueryOutput>
+```
+
+Fetch sleep samples aggregated into one record per night entirely in Swift.
+Timezone is resolved per-sample from HKMetadataKeyTimeZone, falling back to
+userTimezone, then device timezone. Returns ~1 record/night instead of
+thousands of raw samples crossing the JS bridge.
+
+| Param              | Type                                                                                  |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| **`queryOptions`** | <code><a href="#sleepaggregationqueryoptions">SleepAggregationQueryOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#sleepaggregationqueryoutput">SleepAggregationQueryOutput</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -353,6 +374,37 @@ Options for querying HealthKit statistics
 | --------------- | ------------------- |
 | **`startDate`** | <code>string</code> |
 | **`endDate`**   | <code>string</code> |
+
+
+#### SleepAggregationQueryOutput
+
+| Prop             | Type                          |
+| ---------------- | ----------------------------- |
+| **`resultData`** | <code>SleepNightData[]</code> |
+
+
+#### SleepNightData
+
+| Prop                     | Type                |
+| ------------------------ | ------------------- |
+| **`date`**               | <code>string</code> |
+| **`startDate`**          | <code>string</code> |
+| **`endDate`**            | <code>string</code> |
+| **`totalSleepSeconds`**  | <code>number</code> |
+| **`inBedSeconds`**       | <code>number</code> |
+| **`remSeconds`**         | <code>number</code> |
+| **`coreSeconds`**        | <code>number</code> |
+| **`deepSeconds`**        | <code>number</code> |
+| **`unspecifiedSeconds`** | <code>number</code> |
+
+
+#### SleepAggregationQueryOptions
+
+| Prop               | Type                |
+| ------------------ | ------------------- |
+| **`startDate`**    | <code>string</code> |
+| **`endDate`**      | <code>string</code> |
+| **`userTimezone`** | <code>string</code> |
 
 
 ### Type Aliases

@@ -48,6 +48,15 @@ export interface CapacitorHealthkitPlugin {
   queryActivitySummary(
     queryOptions: ActivitySummaryQueryOptions,
   ): Promise<ActivitySummaryQueryOutput>;
+  /**
+   * Fetch sleep samples aggregated into one record per night entirely in Swift.
+   * Timezone is resolved per-sample from HKMetadataKeyTimeZone, falling back to
+   * userTimezone, then device timezone. Returns ~1 record/night instead of
+   * thousands of raw samples crossing the JS bridge.
+   */
+  querySleepAggregatedByNight(
+    queryOptions: SleepAggregationQueryOptions,
+  ): Promise<SleepAggregationQueryOutput>;
 }
 
 /**
@@ -248,4 +257,26 @@ export interface ActivitySummaryData {
 
 export interface ActivitySummaryQueryOutput {
   summaries: ActivitySummaryData[];
+}
+
+export interface SleepAggregationQueryOptions {
+  startDate: string;
+  endDate: string;
+  userTimezone?: string;
+}
+
+export interface SleepNightData {
+  date: string;           // YYYY-MM-DD of the morning (wake-up day)
+  startDate: string;
+  endDate: string;
+  totalSleepSeconds: number;
+  inBedSeconds: number;
+  remSeconds: number;
+  coreSeconds: number;
+  deepSeconds: number;
+  unspecifiedSeconds: number;
+}
+
+export interface SleepAggregationQueryOutput {
+  resultData: SleepNightData[];
 }

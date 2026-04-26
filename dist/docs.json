@@ -174,6 +174,25 @@
           "ActivitySummaryQueryOptions"
         ],
         "slug": "queryactivitysummary"
+      },
+      {
+        "name": "querySleepAggregatedByNight",
+        "signature": "(queryOptions: SleepAggregationQueryOptions) => Promise<SleepAggregationQueryOutput>",
+        "parameters": [
+          {
+            "name": "queryOptions",
+            "docs": "",
+            "type": "SleepAggregationQueryOptions"
+          }
+        ],
+        "returns": "Promise<SleepAggregationQueryOutput>",
+        "tags": [],
+        "docs": "Fetch sleep samples aggregated into one record per night entirely in Swift.\nTimezone is resolved per-sample from HKMetadataKeyTimeZone, falling back to\nuserTimezone, then device timezone. Returns ~1 record/night instead of\nthousands of raw samples crossing the JS bridge.",
+        "complexTypes": [
+          "SleepAggregationQueryOutput",
+          "SleepAggregationQueryOptions"
+        ],
+        "slug": "querysleepaggregatedbynight"
       }
     ],
     "properties": []
@@ -456,6 +475,126 @@
           "docs": "",
           "complexTypes": [],
           "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "SleepAggregationQueryOutput",
+      "slug": "sleepaggregationqueryoutput",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "resultData",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "SleepNightData"
+          ],
+          "type": "SleepNightData[]"
+        }
+      ]
+    },
+    {
+      "name": "SleepNightData",
+      "slug": "sleepnightdata",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "date",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "startDate",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "endDate",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "totalSleepSeconds",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "inBedSeconds",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "remSeconds",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "coreSeconds",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "deepSeconds",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "unspecifiedSeconds",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "SleepAggregationQueryOptions",
+      "slug": "sleepaggregationqueryoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "startDate",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "endDate",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "userTimezone",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string | undefined"
         }
       ]
     }

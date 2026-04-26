@@ -25,5 +25,8 @@ export class CapacitorHealthkitWeb extends WebPlugin {
     async queryActivitySummary(_options) {
         throw this.unimplemented('Not implemented on web.');
     }
+    async querySleepAggregatedByNight(_options) {
+        throw this.unimplemented('Not implemented on web.');
+    }
 }
 //# sourceMappingURL=web.js.map

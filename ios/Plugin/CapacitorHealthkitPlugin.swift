@@ -943,6 +943,184 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
         healthStore.execute(query)
     }
 
+    // Fetch all sleepAnalysis samples and aggregate into one record per night in Swift,
+    // so only ~1 record per night crosses the JS bridge instead of thousands of raw samples.
+    //
+    // Timezone resolution per sample (in priority order):
+    //   1. HKMetadataKeyTimeZone on the sample (Oura, Apple Watch write this)
+    //   2. userTimezone parameter passed from JS
+    //   3. Device's current timezone
+    //
+    // Night boundary: 6 PM to 6 PM. A sample starting before 6 PM local time is attributed
+    // to the previous calendar day's night (the night ending on the wake-up day).
+    @objc func querySleepAggregatedByNight(_ call: CAPPluginCall) {
+        guard let startDateString = call.options["startDate"] as? String,
+              let endDateString = call.options["endDate"] as? String else {
+            return call.reject("Must provide startDate and endDate")
+        }
+
+        let startDate = getDateFromString(inputDate: startDateString)
+        let endDate = getDateFromString(inputDate: endDateString)
+        let fallbackTimezoneId = call.options["userTimezone"] as? String
+
+        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
+            return call.reject("sleepAnalysis type unavailable")
+        }
+
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
+        let sortByDate = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+
+        let query = HKSampleQuery(
+            sampleType: sleepType,
+            predicate: predicate,
+            limit: HKObjectQueryNoLimit,
+            sortDescriptors: [sortByDate]
+        ) { _, samples, error in
+            if let error = error {
+                return call.reject("Error fetching sleep samples: \(error.localizedDescription)")
+            }
+
+            guard let samples = samples as? [HKCategorySample] else {
+                return call.resolve(["resultData": []])
+            }
+
+            let fallbackTimezone: TimeZone
+            if let tzId = fallbackTimezoneId, let tz = TimeZone(identifier: tzId) {
+                fallbackTimezone = tz
+            } else {
+                fallbackTimezone = TimeZone.current
+            }
+
+            struct SleepEntry {
+                let start: Date
+                let end: Date
+                let state: Int
+            }
+
+            var nightBuckets: [String: [SleepEntry]] = [:]
+            var cal = Calendar(identifier: .gregorian)
+
+            for sample in samples {
+                let tz: TimeZone
+                if let tzName = sample.metadata?[HKMetadataKeyTimeZone] as? String,
+                   let resolved = TimeZone(identifier: tzName) {
+                    tz = resolved
+                } else {
+                    tz = fallbackTimezone
+                }
+
+                cal.timeZone = tz
+                let hour = cal.component(.hour, from: sample.startDate)
+                let referenceDate = hour < 18
+                    ? cal.date(byAdding: .day, value: -1, to: sample.startDate) ?? sample.startDate
+                    : sample.startDate
+                let dc = cal.dateComponents([.year, .month, .day], from: referenceDate)
+                guard let y = dc.year, let m = dc.month, let d = dc.day else { continue }
+                let key = String(format: "%04d-%02d-%02d", y, m, d)
+
+                if nightBuckets[key] == nil { nightBuckets[key] = [] }
+                nightBuckets[key]!.append(SleepEntry(start: sample.startDate, end: sample.endDate, state: sample.value))
+            }
+
+            var output: [[String: Any]] = []
+            let iso = ISO8601DateFormatter()
+
+            let inBedState = HKCategoryValueSleepAnalysis.inBed.rawValue
+            let awakeState: Int
+            let asleepUnspecifiedState: Int
+            let asleepCoreState: Int
+            let asleepDeepState: Int
+            let asleepREMState: Int
+
+            if #available(iOS 16.0, *) {
+                awakeState            = HKCategoryValueSleepAnalysis.awake.rawValue
+                asleepUnspecifiedState = HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue
+                asleepCoreState       = HKCategoryValueSleepAnalysis.asleepCore.rawValue
+                asleepDeepState       = HKCategoryValueSleepAnalysis.asleepDeep.rawValue
+                asleepREMState        = HKCategoryValueSleepAnalysis.asleepREM.rawValue
+            } else {
+                awakeState            = 2
+                asleepUnspecifiedState = 1
+                asleepCoreState       = -1
+                asleepDeepState       = -1
+                asleepREMState        = -1
+            }
+
+            for (nightKey, entries) in nightBuckets {
+                let sorted = entries.sorted { $0.start < $1.start }
+
+                let sleepEntries = sorted.filter {
+                    $0.state == asleepUnspecifiedState ||
+                    $0.state == asleepCoreState ||
+                    $0.state == asleepDeepState ||
+                    $0.state == asleepREMState
+                }
+                guard !sleepEntries.isEmpty else { continue }
+
+                let totalSleepSeconds = self.mergePeriods(sleepEntries.map { ($0.start, $0.end) })
+                    .reduce(0.0) { $0 + $1.1.timeIntervalSince($1.0) }
+                guard totalSleepSeconds >= 1800 else { continue }
+
+                let allEntries = sorted.filter {
+                    $0.state == inBedState || $0.state == awakeState ||
+                    $0.state == asleepUnspecifiedState ||
+                    $0.state == asleepCoreState ||
+                    $0.state == asleepDeepState ||
+                    $0.state == asleepREMState
+                }
+                let inBedSeconds = self.mergePeriods(allEntries.map { ($0.start, $0.end) })
+                    .reduce(0.0) { $0 + $1.1.timeIntervalSince($1.0) }
+
+                var remSeconds = 0.0
+                var coreSeconds = 0.0
+                var deepSeconds = 0.0
+                var unspecifiedSeconds = 0.0
+
+                for e in sleepEntries {
+                    let dur = e.end.timeIntervalSince(e.start)
+                    switch e.state {
+                    case asleepREMState:  remSeconds += dur
+                    case asleepCoreState: coreSeconds += dur
+                    case asleepDeepState: deepSeconds += dur
+                    default:              unspecifiedSeconds += dur
+                    }
+                }
+
+                output.append([
+                    "date": nightKey,
+                    "startDate": iso.string(from: sorted.first!.start),
+                    "endDate": iso.string(from: sorted.last!.end),
+                    "totalSleepSeconds": totalSleepSeconds,
+                    "inBedSeconds": max(inBedSeconds, totalSleepSeconds),
+                    "remSeconds": remSeconds,
+                    "coreSeconds": coreSeconds,
+                    "deepSeconds": deepSeconds,
+                    "unspecifiedSeconds": unspecifiedSeconds,
+                ])
+            }
+
+            output.sort { ($0["date"] as! String) < ($1["date"] as! String) }
+            call.resolve(["resultData": output])
+        }
+
+        healthStore.execute(query)
+    }
+
+    // Merge overlapping (start, end) date pairs into non-overlapping spans.
+    private func mergePeriods(_ periods: [(Date, Date)]) -> [(Date, Date)] {
+        guard !periods.isEmpty else { return [] }
+        let sorted = periods.sorted { $0.0 < $1.0 }
+        var merged: [(Date, Date)] = []
+        var curStart = sorted[0].0
+        var curEnd = sorted[0].1
+        for (s, e) in sorted.dropFirst() {
+            if s <= curEnd { curEnd = max(curEnd, e) }
+            else { merged.append((curStart, curEnd)); curStart = s; curEnd = e }
+        }
+        merged.append((curStart, curEnd))
+        return merged
+    }
+
     // Helper method to get the appropriate unit for a quantity type
     private func getUnitForQuantityType(_ quantityType: HKQuantityType) -> HKUnit {
         switch quantityType.identifier {

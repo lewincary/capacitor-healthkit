@@ -12,6 +12,8 @@ import type {
   StatisticsQueryOutput,
   ActivitySummaryQueryOptions,
   ActivitySummaryQueryOutput,
+  SleepAggregationQueryOptions,
+  SleepAggregationQueryOutput,
 } from './definitions';
 
 export class CapacitorHealthkitWeb
@@ -56,6 +58,12 @@ export class CapacitorHealthkitWeb
   async queryActivitySummary(
     _options: ActivitySummaryQueryOptions,
   ): Promise<ActivitySummaryQueryOutput> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  async querySleepAggregatedByNight(
+    _options: SleepAggregationQueryOptions,
+  ): Promise<SleepAggregationQueryOutput> {
     throw this.unimplemented('Not implemented on web.');
   }
 }
