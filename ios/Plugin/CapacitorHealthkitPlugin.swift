@@ -135,8 +135,6 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                 if #available(iOS 11.0, *) {
                     types.insert(HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.vo2Max)!)
                 }
-            case "activitySummary":
-                types.insert(HKObjectType.activitySummaryType())
             default:
                 print("no match in case: " + item)
             }
@@ -614,9 +612,16 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
         }
 
         let writeTypes: Set<HKSampleType> = getTypes(items: _write).union(getTypes(items: _all))
-        let readTypes: Set<HKSampleType> = getTypes(items: _read).union(getTypes(items: _all))
+        let readSampleTypes: Set<HKSampleType> = getTypes(items: _read).union(getTypes(items: _all))
 
-        healthStore.requestAuthorization(toShare: writeTypes, read: readTypes) { success, _ in
+        // HKActivitySummaryType is HKObjectType, not HKSampleType — add it separately
+        var readObjectTypes: Set<HKObjectType> = Set(readSampleTypes.map { $0 as HKObjectType })
+        let allItems = _read + _all
+        if allItems.contains("activitySummary") {
+            readObjectTypes.insert(HKObjectType.activitySummaryType())
+        }
+
+        healthStore.requestAuthorization(toShare: writeTypes, read: readObjectTypes) { success, _ in
             if !success {
                 call.reject("Could not get permission")
                 return
