@@ -820,10 +820,19 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
         let calendar = Calendar.current
         let anchorDate = calendar.startOfDay(for: Date())
         
+        // Use an explicit predicate so HealthKit doesn't need to enumerate all
+        // global data sources (nil predicate triggers "no data source available"
+        // on real devices with large date ranges).
+        let samplePredicate = HKQuery.predicateForSamples(
+            withStart: startDate,
+            end: endDate,
+            options: []
+        )
+
         // Create the query
         let query = HKStatisticsCollectionQuery(
             quantityType: quantityType,
-            quantitySamplePredicate: nil,
+            quantitySamplePredicate: samplePredicate,
             options: statisticsOptions,
             anchorDate: anchorDate,
             intervalComponents: interval
