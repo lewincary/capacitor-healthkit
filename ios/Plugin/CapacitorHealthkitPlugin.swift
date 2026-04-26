@@ -402,6 +402,28 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                     "device": getDeviceInformation(device: sample.device),
                 ]
                 output.append(constructedSample)
+            } else if sampleName == "appleStandHour" {
+                guard let sample = result as? HKCategorySample else {
+                    return nil
+                }
+                let standState: String
+                switch sample.value {
+                case HKCategoryValueAppleStandHour.stood.rawValue:
+                    standState = "Stood"
+                default:
+                    standState = "Idle"
+                }
+                let constructedSample: [String: Any] = [
+                    "uuid": sample.uuid.uuidString,
+                    "startDate": ISO8601DateFormatter().string(from: sample.startDate),
+                    "endDate": ISO8601DateFormatter().string(from: sample.endDate),
+                    "duration": sample.endDate.timeIntervalSince(sample.startDate) / 3600,
+                    "standState": standState,
+                    "source": sample.sourceRevision.source.name,
+                    "sourceBundleId": sample.sourceRevision.source.bundleIdentifier,
+                    "device": getDeviceInformation(device: sample.device),
+                ]
+                output.append(constructedSample)
             } else if sampleName == "workoutType" {
                 guard let sample = result as? HKWorkout else {
                     return nil
