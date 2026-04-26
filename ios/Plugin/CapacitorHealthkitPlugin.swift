@@ -832,11 +832,17 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
         // Set the results handler
         query.initialResultsHandler = { query, results, error in
             if let error = error {
+                // "No data source available" is not a real error — the type simply
+                // hasn't been recorded on this device yet. Resolve with empty data.
+                let msg = error.localizedDescription.lowercased()
+                if msg.contains("no data source") || msg.contains("unable to invalidate") {
+                    return call.resolve(["statistics": []])
+                }
                 return call.reject("Error fetching statistics: \(error.localizedDescription)")
             }
-            
+
             guard let results = results else {
-                return call.reject("No results returned")
+                return call.resolve(["statistics": []])
             }
             
             var statisticsArray: [[String: Any]] = []
