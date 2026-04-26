@@ -10,6 +10,8 @@ import type {
   MultipleEditionQuery,
   StatisticsQueryOptions,
   StatisticsQueryOutput,
+  ActivitySummaryQueryOptions,
+  ActivitySummaryQueryOutput,
 } from './definitions';
 
 export class CapacitorHealthkitWeb
@@ -48,6 +50,12 @@ export class CapacitorHealthkitWeb
   async queryHKitStatistics(
     _options: StatisticsQueryOptions,
   ): Promise<StatisticsQueryOutput> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  async queryActivitySummary(
+    _options: ActivitySummaryQueryOptions,
+  ): Promise<ActivitySummaryQueryOutput> {
     throw this.unimplemented('Not implemented on web.');
   }
 }

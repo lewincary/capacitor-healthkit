@@ -22,5 +22,8 @@ export class CapacitorHealthkitWeb extends WebPlugin {
     async queryHKitStatistics(_options) {
         throw this.unimplemented('Not implemented on web.');
     }
+    async queryActivitySummary(_options) {
+        throw this.unimplemented('Not implemented on web.');
+    }
 }
 //# sourceMappingURL=web.js.map
