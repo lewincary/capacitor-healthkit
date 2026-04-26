@@ -654,7 +654,9 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
             return call.reject("Error in sample name")
         }
 
-        let query = HKSampleQuery(sampleType: sampleType, predicate: predicate, limit: limit, sortDescriptors: nil) {
+        // Sort newest-first so a limit cut always drops old data, not recent data
+        let sortByDate = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        let query = HKSampleQuery(sampleType: sampleType, predicate: predicate, limit: limit, sortDescriptors: [sortByDate]) {
             _, results, _ in
             guard let output: [[String: Any]] = self.generateOutput(sampleName: _sampleName, results: results) else {
                 return call.reject("Error happened while generating outputs")
