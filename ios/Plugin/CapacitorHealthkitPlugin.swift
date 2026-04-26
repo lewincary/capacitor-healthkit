@@ -898,8 +898,10 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
         let endDate = getDateFromString(inputDate: endDateString)
 
         let calendar = Calendar.current
-        let startComponents = calendar.dateComponents([.year, .month, .day], from: startDate)
-        let endComponents = calendar.dateComponents([.year, .month, .day], from: endDate)
+        var startComponents = calendar.dateComponents([.year, .month, .day], from: startDate)
+        var endComponents = calendar.dateComponents([.year, .month, .day], from: endDate)
+        startComponents.calendar = calendar
+        endComponents.calendar = calendar
 
         let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: startComponents, end: endComponents)
 
