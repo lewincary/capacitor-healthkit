@@ -483,16 +483,13 @@ public class CapacitorHealthkitPlugin: CAPPlugin {
                     TSSCData = sample.totalSwimmingStrokeCount?.doubleValue(for: unitTSSC!)
                 }
 
-                let workoutSD = sample.startDate as NSDate
-                let workoutED = sample.endDate as NSDate
-                let workoutInterval = workoutED.timeIntervalSince(workoutSD as Date)
-                let workoutHoursBetweenDates = workoutInterval / 3600
+                let workoutDurationSeconds = sample.endDate.timeIntervalSince(sample.startDate)
 
                 output.append([
                     "uuid": sample.uuid.uuidString,
                     "startDate": ISO8601DateFormatter().string(from: sample.startDate),
                     "endDate": ISO8601DateFormatter().string(from: sample.endDate),
-                    "duration": workoutHoursBetweenDates,
+                    "duration": workoutDurationSeconds, // seconds
                     "source": sample.sourceRevision.source.name,
                     "sourceBundleId": sample.sourceRevision.source.bundleIdentifier,
                     "device": getDeviceInformation(device: sample.device),
